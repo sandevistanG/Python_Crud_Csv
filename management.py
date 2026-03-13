@@ -42,9 +42,9 @@ def createig(arq):
 
 def registercsv(arq):
     idd = createig(arq)
-    name = str(input('Client Name: '))
+    name = str(input('Client Name: ')).title().strip()
     age = interface.readint('Age: ')
-    city = str(input('City: '))
+    city = str(input('City: ')).title().strip()
 
     row = [idd, name, age, city]
 
@@ -56,7 +56,7 @@ def registercsv(arq):
 
 
 def showdata(arq):
-    mydata = loaddata(arq)
+    mydata = sorted(loaddata(arq), key=lambda c: c['NAME'])
     for c in mydata:
         print(f'ID: {c['ID']}  {c['NAME']:<18} {c['AGE']} YO {c['CITY']:>15}')
 
@@ -95,30 +95,62 @@ def rewritecsv(arq, data):
 def deleteupdate(arq, dele=False):
     idd = searchcsv(arq)
     mydata = loaddata(arq)
+    if not idd:
+        return
 
-    if idd:
-        for c in mydata:
-            if idd == c['ID']:
+    for c in mydata:
+        if idd == c['ID']:
 
-                if dele:
-                    mydata.remove(c)
-                    print('\033[1mCLIENT REMOVED!\033[m')
-                    break
-                else:
+            if dele:
+                mydata.remove(c)
+                rewritecsv(arq, mydata)
+                print('\033[1mCLIENT REMOVED!\033[m')
+                break
+            else:
+                while True:
                     opt = interface.menu(['Change Name',
                           'Change Age',
                           'Change City'])
-                    if opt == 1:
-                        c['NAME'] = str(input('New Name: '))
-                    if opt == 2:
-                        c['AGE'] = interface.readint('New Age: ')
-                    if opt == 3:
-                        c['CITY'] = str(input('New City: '))
+                    if opt in (1, 2, 3):
+                        if opt == 1:
+                            c['NAME'] = str(input('New Name: ')).strip().title()
+                        elif opt == 2:
+                            c['AGE'] = interface.readint('New Age: ')
+                        else:
+                            c['CITY'] = str(input('New City: ')).strip().title()
+                        rewritecsv(arq, mydata)
+                        print('\033[1mCLIENT UPDATED!\033[m')
+                        return
                     else:
-                        print('INVALID OPTION')
-                    print('\033[1mCLIENT UPDATED!\033[m')
-                    break
-        rewritecsv(arq, mydata)
+                        print('\033[1;31mINVALID OPTION\033[m')
+
+
+def staticscsv(arq):             #Collect the Following Insights:
+    from time import sleep       #Age Average - Clients Quantity - Number of cities
+
+    mydata = loaddata(arq)
+    if mydata:
+        quant = len(mydata)
+        avg_age = sum([c['AGE']  for c in mydata]) / quant
+
+        cities = {}
+        for c in mydata:
+            city = c['CITY']
+            cities[city] = cities.get(city, 0) + 1
+
+        print(f'Age Average: {avg_age:.2f}')
+        interface.line()
+        sleep(0.7)
+
+        print(f'Total Clients Registered: {quant}')
+        interface.line()
+        sleep(0.7)
+
+        print(f'Total Cities:')
+        for city, count in cities.items():
+             print(f'{city:<10} {count}x')
+        interface.line()
+
 
 
 

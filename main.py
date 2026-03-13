@@ -8,7 +8,7 @@ management.verifycreate(arqq)
 
 
 while True:
-    opt = interface.menu(['Register Client', 'Show All Clients', 'Search Client By Id', 'Delete Client', 'EDIT CLIENT', 'Exit'])
+    opt = interface.menu(['Register Client', 'Show All Clients', 'Search Client By Id', 'Delete Client', 'EDIT CLIENT', 'See Statics','Exit'])
 
     if opt == 1:
         interface.header('Register New Client')
@@ -38,6 +38,11 @@ while True:
         sleep(2)
 
     elif opt == 6:
+        interface.header('Clients Statics: ')
+        management.staticscsv(arqq)
+        sleep(2)
+
+    elif opt == 7:
         interface.header('FINISHING PROGRAM...')
         sleep(1)
         break
